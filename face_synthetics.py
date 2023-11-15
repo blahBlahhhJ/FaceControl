@@ -17,8 +17,6 @@ _FEATURES = datasets.Features(
     },
 )
 
-DATA_DIR = "./dataset_100"
-
 _DEFAULT_CONFIG = datasets.BuilderConfig(name="default", version=_VERSION)
 
 
@@ -37,7 +35,7 @@ class FaceSynthetics(datasets.GeneratorBasedBuilder):
         )
 
     def _split_generators(self, dl_manager):
-        metadata_path = os.path.join(DATA_DIR, "metadata.jsonl")
+        metadata_path = os.path.join(self.config.data_dir, "metadata.jsonl")
 
         return [
             datasets.SplitGenerator(
@@ -49,22 +47,22 @@ class FaceSynthetics(datasets.GeneratorBasedBuilder):
             ),
         ]
 
-    def _generate_examples(self, metadata_path, images_dir, conditioning_images_dir):
+    def _generate_examples(self, metadata_path):
         metadata = pd.read_json(metadata_path, lines=True)
 
         for _, row in metadata.iterrows():
-            id = f"{row['id']:06d}"
+            id_ = f"{row['id']:06d}"
             text = row["text"]
 
-            image_path = os.path.join(DATA_DIR, f"{id}.png")
-            conditioning_image_path = os.path.join(DATA_DIR, f"{id}_cond.png")
+            image_path = os.path.join(self.config.data_dir, f"{id_}.png")
+            conditioning_image_path = os.path.join(self.config.data_dir, f"{id_}_cond.png")
 
             with open(image_path, "rb") as f:
                 image = f.read()
             with open(conditioning_image_path, "rb") as f:
                 conditioning_image = f.read()
 
-            yield id, {
+            yield id_, {
                 "text": text,
                 "image": {
                     "path": image_path,
