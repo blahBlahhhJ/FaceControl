@@ -35,14 +35,22 @@ class FaceSynthetics(datasets.GeneratorBasedBuilder):
         )
 
     def _split_generators(self, dl_manager):
-        metadata_path = os.path.join(self.config.data_dir, "metadata.jsonl")
+        metadata_train_path = os.path.join(self.config.data_dir, "metadata_train.jsonl")
+        metadata_val_path = os.path.join(self.config.data_dir, "metadata_val.jsonl")
 
         return [
             datasets.SplitGenerator(
                 name=datasets.Split.TRAIN,
                 # These kwargs will be passed to _generate_examples
                 gen_kwargs={
-                    "metadata_path": metadata_path,
+                    "metadata_path": metadata_train_path,
+                },
+            ),
+            datasets.SplitGenerator(
+                name=datasets.Split.VALIDATION,
+                # These kwargs will be passed to _generate_examples
+                gen_kwargs={
+                    "metadata_path": metadata_val_path,
                 },
             ),
         ]
