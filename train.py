@@ -95,43 +95,26 @@ def log_validation(vae, text_encoder, tokenizer, unet, controlnet, args, acceler
     else:
         generator = torch.Generator(device=accelerator.device).manual_seed(args.seed)
     
-    ious, sims = [], []
-    for batch in val_dataloader:
+    clips, ious, dists = [], [], []
+    for batch in tqdm(val_dataloader):
         with torch.autocast("cuda"):
             image = pipeline(
                 batch['input_ids'], batch['conditioning_pixel_values'], 
                 num_inference_steps=20, generator=generator
             ).images[0]
-            iou, similarity = metric(batch['orig_images'][0], image)
-        ious.append(iou)
-        sims.append(similarity)
+            clip, iou, distance = metric(batch['orig_images'][0], image, batch['input_ids'][0])
 
-    accelerator.log({"val_iou": np.array(ious).mean(), "val_similarity": np.array(sims).mean()}, step=step)
+        clips.append(clip)
+        ious.append(iou)
+        dists.append(distance)
+
+    accelerator.log({
+        "val_clip": np.array(clips).mean(), 
+        "val_iou": np.array(ious).mean(), 
+        "val_distance": np.array(dists).mean()
+    }, step=step)
 
     logging.info("Running validation on custom data... ")
-
-    pipeline = StableDiffusionControlNetPipeline.from_pretrained(
-        args.pretrained_model_name_or_path,
-        vae=vae,
-        text_encoder=text_encoder,
-        tokenizer=tokenizer,
-        unet=unet,
-        controlnet=controlnet,
-        safety_checker=None,
-        revision=args.revision,
-        torch_dtype=weight_dtype,
-    )
-    pipeline.scheduler = UniPCMultistepScheduler.from_config(pipeline.scheduler.config)
-    pipeline = pipeline.to(accelerator.device)
-    pipeline.set_progress_bar_config(disable=True)
-
-    if args.enable_xformers_memory_efficient_attention:
-        pipeline.enable_xformers_memory_efficient_attention()
-
-    if args.seed is None:
-        generator = None
-    else:
-        generator = torch.Generator(device=accelerator.device).manual_seed(args.seed)
 
     if len(args.validation_image) == len(args.validation_prompt):
         validation_images = args.validation_image
