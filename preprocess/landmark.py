@@ -52,13 +52,31 @@ def draw(image, landmarks, radius=2.5, color="white"):
         x, y = dot
         draw.ellipse((x-radius, y-radius, x+radius, y+radius), fill=color)
 
+def draw_path(draw, points, color="white", width=3):
+    for i in range(len(points) - 1):
+        draw.line([points[i], points[i+1]], fill=color, width=width)
+
+def draw2(image, landmarks, radius=2.5, color="white"):
+    draw = ImageDraw.Draw(image)
+    ldmks = [tuple(dot) for dot in landmarks]
+    draw_path(draw, ldmks[0: 17], color='green')
+    draw_path(draw, ldmks[17: 22], color='yellow')
+    draw_path(draw, ldmks[22: 27], color='yellow')
+    draw_path(draw, ldmks[27: 31], color='orange')
+    draw_path(draw, ldmks[31: 36], color='orange')
+    draw.polygon(ldmks[36: 42], fill="#ff80ea", outline='magenta')
+    draw.polygon(ldmks[42: 48], fill="#ff80ea", outline='magenta')
+    draw.polygon(ldmks[48: 60], fill="#99eeff", outline='cyan')
+    draw.polygon(ldmks[60: 68], fill="#66b3ff", outline='blue')
+
+
 def main(args):
     processor = SPIGAFramework(ModelConfig("300wpublic"))
 
     for i in tqdm(range(args.num_data)):
         image_path = os.path.join(args.dataset_path, f"{i:06d}.png")
         landmark_path = os.path.join(args.dataset_path, f"{i:06d}_ldmks.txt")
-        out_path = os.path.join(args.dataset_path, f"{i:06d}_cond.png")
+        out_path = os.path.join(args.dataset_path, f"{i:06d}_cond2.png")
 
         assert os.path.exists(image_path), f"Missing data: {image_path}"
         assert os.path.exists(landmark_path), f"Missing data: {landmark_path}"
@@ -74,7 +92,7 @@ def main(args):
         landmarks = features["landmarks"][0]
 
         cond_img = Image.new('RGB', (512, 512), color=(0, 0, 0))
-        draw(cond_img, landmarks)
+        draw2(cond_img, landmarks)
         cond_img.save(out_path)
 
 

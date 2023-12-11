@@ -12,7 +12,7 @@ accelerate launch train.py \
  --train_data_dir=$TRAIN_DATA_DIR \
  --resolution=512 \
  --learning_rate=1e-5 \
- --validation_image "./evaluation_samples/099998_cond.png" "./evaluation_samples/099999_cond.png" \
+ --validation_image "./evaluation_samples/099998_cond2.png" "./evaluation_samples/099999_cond2.png" \
  --validation_prompt "High-quality close-up photo of a girl standing in a classroom" "Portrait of a man in a suit, looking down" \
  --train_batch_size=4 \
  --gradient_accumulation_steps=1 \

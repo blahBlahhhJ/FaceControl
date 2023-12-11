@@ -46,6 +46,7 @@ from diffusers import (
     DDPMScheduler,
     StableDiffusionControlNetPipeline,
     StableDiffusionControlNetImg2ImgPipeline,
+    StableDiffusionImg2ImgPipeline,
     UNet2DConditionModel,
     UniPCMultistepScheduler,
 )
@@ -83,6 +84,16 @@ def log_validation(vae, text_encoder, tokenizer, unet, controlnet, args, acceler
         revision=args.revision,
         torch_dtype=weight_dtype,
     )
+    # pipeline = StableDiffusionImg2ImgPipeline.from_pretrained(
+    #     args.pretrained_model_name_or_path,
+    #     vae=vae,
+    #     text_encoder=text_encoder,
+    #     tokenizer=tokenizer,
+    #     unet=unet,
+    #     safety_checker=None,
+    #     revision=args.revision,
+    #     torch_dtype=weight_dtype,
+    # )
     pipeline.scheduler = UniPCMultistepScheduler.from_config(pipeline.scheduler.config)
     pipeline = pipeline.to(accelerator.device)
     pipeline.set_progress_bar_config(disable=True)

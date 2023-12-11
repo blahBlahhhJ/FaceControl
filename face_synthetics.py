@@ -63,7 +63,7 @@ class FaceSynthetics(datasets.GeneratorBasedBuilder):
             text = row["text"]
 
             image_path = os.path.join(self.config.data_dir, f"{id_}.png")
-            conditioning_image_path = os.path.join(self.config.data_dir, f"{id_}_cond.png")
+            conditioning_image_path = os.path.join(self.config.data_dir, f"{id_}_cond2.png")
 
             with open(image_path, "rb") as f:
                 image = f.read()
